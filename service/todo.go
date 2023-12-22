@@ -25,6 +25,15 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 		insert  = `INSERT INTO todos(subject, description) VALUES(?, ?)`
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
+	result, err := s.db.ExecContext(ctx, insert, subject, description)
+	if err != nil {
+		return nil, err
+	}
+
+	lastId, err := s.db.ExecContext(ctx, insert, subject, description)
+	if lastId != nil {
+		return lastId
+	}
 
 	return nil, nil
 }
