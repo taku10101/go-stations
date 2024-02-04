@@ -29,7 +29,7 @@ func healthRouter(mux *http.ServeMux) {
 // todoに関するルータを定義
 func todoRouter(mux *http.ServeMux, db *sql.DB) {
 	todo := handler.NewTODOHandler(service.NewTODOService(db))//TODOHandlerを生成
-
+	
 	mux.HandleFunc("/todos", func(w http.ResponseWriter, r *http.Request) {//"/todos"に対するリクエストを処理する
 		var err error
 		switch r.Method {
@@ -54,10 +54,11 @@ func todoRouter(mux *http.ServeMux, db *sql.DB) {
 	})
 }
 
-// 任意のstatusをヘッドに入れたレスポンスを返す
+
 func responseJson(w http.ResponseWriter, status int, response interface{}) error {
-	
+	//レスポンスを書き込む
 	w.WriteHeader(status)
+	//encodeして書き込む
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		return err
 	}
