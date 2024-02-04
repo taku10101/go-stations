@@ -26,6 +26,7 @@ func healthRouter(mux *http.ServeMux) {
 
 }
 
+
 // todoに関するルータを定義
 func todoRouter(mux *http.ServeMux, db *sql.DB) {
 	todo := handler.NewTODOHandler(service.NewTODOService(db))//TODOHandlerを生成
@@ -46,13 +47,17 @@ func todoRouter(mux *http.ServeMux, db *sql.DB) {
 		default:
 			// TODO:エラーハンドリングする
 		}
+	
 		//エラーがあった場合ログ出力して500を返す
 		if err != nil {
 			log.Println(err)
 			responseJson(w, http.StatusInternalServerError, err)
 		}
 	})
+	return 
 }
+
+
 
 
 func responseJson(w http.ResponseWriter, status int, response interface{}) error {
@@ -63,4 +68,11 @@ func responseJson(w http.ResponseWriter, status int, response interface{}) error
 		return err
 	}
 	return nil
+}
+
+func buildChain(h http.Handler, m ...func(http.Handler) http.Handler) http.Handler {
+	if len(m) == 0 {
+		return h
+	}
+	return m[0](buildChain(h, m[1:cap(m)]...))
 }
